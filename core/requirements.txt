@@ -1,0 +1,3 @@
+fastapi
+uvicorn
+# اختياري — الخدمة تعمل بالمقلوب stdlib بلا أي تبعية خارجية (server.py auto-fallback)

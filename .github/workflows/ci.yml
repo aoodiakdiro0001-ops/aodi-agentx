@@ -1,0 +1,38 @@
+name: Aodı-AgentX CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Run scanner tests
+        run: python3 tests/test_scanner.py -v
+
+  go-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.21" }
+      - name: vet + build netmgr
+        run: |
+          cd netmgr
+          gofmt -w .
+          go vet ./...
+          go build ./...
+
+  node-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: syntax check CLI
+        run: node --check cli/index.js

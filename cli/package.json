@@ -1,0 +1,12 @@
+{
+  "name": "aodi-agentx",
+  "version": "1.0.0",
+  "description": "Aodı-AgentX — distributed multi-agent AI operations framework CLI (zero dependencies)",
+  "bin": { "aodi-agentx": "index.js" },
+  "bin_ar": "",
+  "files": ["index.js"],
+  "keywords": ["ai", "agents", "ollama", "security", "audit", "cli", "distributed"],
+  "author": "Baran Avisat <baranavisat@gmail.com>",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/aoodiakdiro0001-ops/aodi-agentx" }
+}

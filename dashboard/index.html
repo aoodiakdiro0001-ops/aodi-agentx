@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aodı-AgentX — لوحة التشغيل</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--line:#262a33;--txt:#e8eaed;--sub:#9aa3af;
+--ok:#22c55e;--warn:#f0b429;--bad:#ef4444;--acc:#22c55e;--card:#1c2029}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 26px;background:var(--panel);border-bottom:1px solid var(--line)}
+h1{font-size:19px;font-weight:700}h1 span{color:var(--acc)}
+.badge{font-size:12px;color:var(--sub)}
+main{max-width:1080px;margin:0 auto;padding:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h3{font-size:13px;color:var(--sub);margin-bottom:8px;font-weight:600}
+.card .v{font-size:20px;font-weight:700}
+.node{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--card);font-size:13px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:6px}
+.dot.on{background:var(--ok)}.dot.off{background:var(--bad)}
+.run{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+button{background:var(--acc);color:#08120a;border:0;padding:9px 16px;border-radius:9px;font-weight:700;cursor:pointer;font-size:13px}
+button.sec{background:#2a2f3a;color:var(--txt)}
+input{background:#12151b;border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 12px;font-size:13px;min-width:210px}
+.finding{border-inline-start:3px solid var(--warn);background:var(--card);margin:8px 0;padding:9px 12px;border-radius:8px;font-size:13px}
+.finding.high{border-color:var(--bad)}.finding.low{border-color:var(--acc)}
+.sev{font-weight:700;margin-inline-end:6px}
+footer{color:var(--sub);font-size:12px;text-align:center;padding:20px}
+a{color:var(--acc);text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Aodı-<span>AgentX</span> — لوحة التشغيل الموزعة</h1>
+  <div class="badge" id="ver"></div>
+</header>
+<main>
+  <div class="grid">
+    <div class="card"><h3>العقد الصحيحة</h3><div class="v" id="okN">–</div></div>
+    <div class="card"><h3>زمن سريع وكيل</h3><div class="v" id="lat">–</div></div>
+    <div class="card"><h3>مهام نشطة</h3><div class="v" id="tasksN">–</div></div>
+    <div class="card"><h3>مخاطر عالية</h3><div class="v" id="hiN">–</div></div>
+  </div>
+
+  <div class="card">
+    <h3>إضافة عقدة Ollama</h3>
+    <div class="run">
+      <input id="nName" placeholder="اسم العقدة (mac-local)">
+      <input id="nUrl" placeholder="http://127.0.0.1:11434 أو https://….lhr.life">
+      <button onclick="addNode()">ربط</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>المهام متعدد الوكلاء</h3>
+    <div class="run">
+      <input id="tPath" placeholder="مسار مجلد (examples)">
+      <button onclick="runTask('code_audit')">تدقيق أمني</button>
+      <button class="sec" onclick="runTask('test_gen')">اختبارات</button>
+      <button class="sec" onclick="runTask('custom')">مهمة حرة</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px"><h3>العقد</h3><div id="nodes"></div></div>
+  <div class="card" style="margin-top:14px"><h3>التقرير</h3><div id="report" style="color:var(--sub)">—</div></div>
+</main>
+<footer>Aodı-AgentX v1.0.0 · MIT © 2026 Baran Avisat · <a href="mailto:baranavisat@gmail.com">baranavisat@gmail.com</a> · <a href="https://wa.me/905313263722">WhatsApp +90 531 326 37 22</a></footer>
+<script>
+const API = location.origin;
+async function j(url, body) {
+  const r = await fetch(url, body ? {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(body)} : undefined);
+  return r.json();
+}
+function esc(s){const d=document.createElement("div");d.textContent=String(s||"");return d.innerHTML;}
+async function refresh() {
+  const h = await j(API + "/api/health").catch(()=>null);
+  if (!h) return;
+  document.getElementById("ver").textContent = `${h.brand} v${h.version}`;
+  const nodes = h.nodes || [];
+  document.getElementById("okN").textContent = nodes.filter(n=>n.ok).length + " / " + nodes.length;
+  document.getElementById("nodes").innerHTML = nodes.map(n =>
+    `<div class="node"><span class="dot ${n.ok?"on":"off"}"></span><b>${esc(n.name)}</b> — ${esc(n.url)}${n.ok?` · ${n.latency_ms}ms · ${esc(n.model||"")}`:` · ${esc(n.error||"")}`}</div>`).join("");
+  const t = await j(API + "/api/tasks").catch(()=>({tasks:[]}));
+  document.getElementById("tasksN").textContent = (t.tasks||[]).filter(x=>x.status==="running"||x.status==="queued").length;
+}
+async function addNode(){
+  const name = document.getElementById("nName").value, url = document.getElementById("nUrl").value;
+  if (!name || !url) return alert("اكتب الاسم والرابط");
+  alert(name + " → " + (await j(API + "/api/nodes", {name,url}).then(r=>r.ok?"تم الربط ":"فشل: " + (r.error||""))));
+  refresh();
+}
+async function runTask(kind){
+  const p = document.getElementById("tPath").value || "examples";
+  const t = await j(API + "/api/tasks", {kind, path:p}).catch(()=>null);
+  if (!t || !t.id) return alert("فشل الإرسال");
+  poll(t.id, kind);
+  document.getElementById("report").textContent = "⏳ تُشغَّل مهمة " + t.id + " …";
+}
+function poll(id, kind){
+  clearInterval(window.pi);
+  window.pi = setInterval(async () => {
+    const t = await j(API + "/api/tasks/" + id).catch(()=>null);
+    if (t && (t.status === "done" || t.status === "failed")) {
+      clearInterval(window.pi);
+      render(t, kind);
+      refresh();
+    }
+  }, 2500);
+}
+function render(t, kind){
+  const el = document.getElementById("report");
+  if (t.status === "failed") return el.innerHTML = `<b style="color:var(--bad)">فشلت: ${esc(t.error)}</b>`;
+  const res = t.result || {};
+  if (kind === "code_audit") {
+    if (res.total_findings !== undefined) {
+      document.getElementById("hiN").textContent = (res.stats?.by_severity?.high) || 0;
+      el.innerHTML = `<div>الملفات ${res.files_scanned} · آلي ${res.static_findings} · وكلاء ${res.agent_findings} · <b>إجمالي ${res.total_findings}</b></div><div style="margin-top:8px">` +
+        (res.findings||[]).slice(0, 40).map(f =>
+          `<div class="finding ${f.severity}"><span class="sev">${f.severity.toUpperCase()}</span> ${esc(f.file)}:${f.line} <b>${esc(f.rule)}</b> ${esc(f.message||"")}</div>`).join("") + "</div>";
+      return;
+    }
+  }
+  if (res.written) return el.innerHTML = `<b>اختبارات كُتبت:</b> ${esc(res.written)}`;
+  if (res.output) return el.textContent = res.output;
+  el.innerHTML = `<pre>${esc(JSON.stringify(res, null, 1))}</pre>`;
+}
+refresh(); setInterval(refresh, 7000);
+</script>
+</body>
+</html>

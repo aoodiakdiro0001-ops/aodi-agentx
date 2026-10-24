@@ -116,9 +116,9 @@ function render(t, kind){
   if (kind === "code_audit") {
     if (res.total_findings !== undefined) {
       document.getElementById("hiN").textContent = (res.stats?.by_severity?.high) || 0;
-      el.innerHTML = `<div>الملفات ${res.files_scanned} · آلي ${res.static_findings} · وكلاء ${res.agent_findings} · <b>إجمالي ${res.total_findings}</b></div><div style="margin-top:8px">` +
+      el.innerHTML = `<div><bdi>الملفات ${res.files_scanned}</bdi> · <bdi>آلي ${res.static_findings}</bdi> · <bdi>وكلاء ${res.agent_findings}</bdi> · <bdi><b>إجمالي ${res.total_findings}</b></bdi></div><div style="margin-top:8px">` +
         (res.findings||[]).slice(0, 40).map(f =>
-          `<div class="finding ${f.severity}"><span class="sev">${f.severity.toUpperCase()}</span> ${esc(f.file)}:${f.line} <b>${esc(f.rule)}</b> ${esc(f.message||"")}</div>`).join("") + "</div>";
+          `<div class="finding ${f.severity}"><bdi>${f.severity.toUpperCase()}</bdi> <bdi>${esc(f.file)}:${f.line}</bdi> <b>${esc(f.rule)}</b> ${esc(f.message||"")}</div>`).join("") + "</div>";
       return;
     }
   }

@@ -34,7 +34,7 @@
 ```
 
 - **Python (core):** تنظيم مهام الوكلاء، تقسيم الدفعات، تحويل عقدة فاشلة إلى صحيحة، مهام بالخيوط.
-- **Go (netmgr):** فحص حتى 3000 منفذ بـ200 goroutine، وموارد النظام، وprobe للروابط — بلا تبعيات.
+- **Go (netmgr):** فحص حتى 3000 منفذ بـ200 goroutine، وموارد النظام، و probe للروابط — بلا تبعيات.
 - **Node (CLI):** صفر تبعيات npm — أوامر عربية واضحة وملف ترميز محلي.
 - **Solidity (اختياري):** registry للبصمات: من سجّل وماذا ومتى.
 
@@ -56,19 +56,32 @@ node index.js run code_audit --path ../examples
 open http://127.0.0.1:8787/dashboard
 ```
 
-اختياري: `pip install fastapi uvicorn` ثم `python3 core/server.py --engine fastapi` — وnetmgr: داخل `netmgr/` نفّذ `go build -o agentx-netmgr .` ثم `./agentx-netmgr` (GET `/ports?host=127.0.0.1&from=1&to=1024`).
+اختياري: `pip install fastapi uvicorn` ثم `python3 core/server.py --engine fastapi` — و netmgr: داخل `netmgr/` نفّذ `go build -o agentx-netmgr .` ثم `./agentx-netmgr` (GET `/ports?host=127.0.0.1&from=1&to=1024`).
 
 ## الضمانات
 
 - الوضع الأساسي صفر تبعيات خارجية: `urllib` + `http.server` + `threading`.
 - فشل سلس: عقدة سقطت؟ تُنقل دفعتها تلقائياً إلى العقدة التالية الصحيحة.
 - تدقيق حقيقي متعدد اللغات: Python / JS / Go / Java / SQL / YAML / Solidity.
-- 6 اختبارات وحدة بلا شبكة: `python3 tests/test_scanner.py` — وCI مجانية على GitHub Actions.
+- 6 اختبارات وحدة بلا شبكة: `python3 tests/test_scanner.py` — و CI مجانية على GitHub Actions.
 - حدود تشغيل واضحة: مهلة الطلب `AODX_TIMEOUT` (180 ثانية افتراضاً) وحد الملف 100KB.
+
+## أرقام من جلسة حية (Mac · Ollama v0.34.4 · qwen2.5-coder)
+
+| القياس | النتيجة |
+|---|---|
+| تسجيل عقدة جديدة | **38ms** (اكتشاف نماذج متوازٍ) |
+| فحص 1200 منفذ عبر netmgr (goroutines) | **26ms** |
+| تدقيق `examples` الكامل (آلي + وكيل) | **48–165s** حسب حمولة النموذج — آلي 5 مؤكدة من الوكيل · 2 ملفات |
+| لوحة التحكم | تحديث كل 7 ثوان · عربية RTL |
+
+![لوحة Aodı-AgentX](docs/dashboard-demo.png)
+
+![تقرير تدقيق حي من اللوحة](docs/dashboard-live.png)
 
 ## خريطة المسار
 
-- قواعد إضافية لمحللات Solidity وGo وJava (10 قواعد الآن).
+- قواعد إضافية لمحللات Solidity و Go و Java (10 قواعد الآن).
 - إخراج SARIF لدمج GitHub Code Scanning.
 - watch في netmgr للإفراغ التلقائي والتنبيهات.
 - طبق عقود: نشر AgentXProof على Sepolia بأمر واحد.

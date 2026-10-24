@@ -39,7 +39,7 @@ async function main() {
   const provider = new ethers.JsonRpcProvider(rpc);
   const wallet = new ethers.Wallet(pk, provider);
   const addr = "0x0000000000000000000000000000000000000000"; // ← نشر عقدك ثم ضع عنوانه
-  console.error("ضع عنوان عقد AgentXProof المرسоса في السطر أعلاه قبل التشغيل.");
+  console.error("ضع عنوان العقد المنشورة AgentXProof في السطر أعلاه قبل التشغيل.");
   const c = new ethers.Contract(addr, ABI, wallet);
   const tx = await c.anchor(hash, meta);
   console.log("tx:", tx.hash, "hash:", hash, "meta:", meta);

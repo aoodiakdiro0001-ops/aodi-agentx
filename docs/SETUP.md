@@ -8,7 +8,7 @@
 ## تثبيت وتشغيل (5 أوامر)
 
 ```bash
-python3 core/server.py --port 8787          # ثمратив core
+python3 core/server.py --port 8787          # إقلاع core
 cd cli && node index.js init                # فحص العقد
 node index.js add-node mac http://127.0.0.1:11434
 node index.js run code_audit --path ../examples
@@ -19,7 +19,7 @@ open http://127.0.0.1:8787/dashboard
 
 1. على الجهاز الثاني: ثبّت Ollama ثم `ollama pull qwen2.5-coder`
 2. انشر الخدمة خارجياً: `OLLAMA_HOST=0.0.0.0 ollama serve` — أو نفق آمن: `ssh -R 80:localhost:11434 nokey@localhost.run` وسيطبع رابط https
-3. من الجهاز الأول: `node index.js add-node win https:// ر-link .lhr.life`
+3. من الجهاز الأول: `node index.js add-node win https://<رابط-النفق>.lhr.life`
 
 أو (الأفضل على المدى البعيد): **Tailscale** على كل جهاز بحساب واحد ثم `add-node win http://100.x.y.z:11434`
 
